@@ -13,12 +13,12 @@ GGUF 是一种用来保存模型的文件格式，用来存储使用 GGML 进行
 GGUF 是一种基于现有的 GGJT 的格式，但是在格式上做了一些调整来让它更有扩展性并且更容易使用。需要具备以下特性：
 
 - 单文件部署：模型可以被很容易的分发和加载，并且不需要任何外部文件来提供附加信息。
-- 可扩展：可以向基于 GGML 的执行器中添加新特性/可以向 GGUF 模型中添加新信息，而不会破坏对于现有模型的兼容性。
+- 可扩展：可以向基于 GGML 的执行器中添加新特性 / 可以向 GGUF 模型中添加新信息，而不会破坏对于现有模型的兼容性。
 - `mmap` 兼容性：模型可以使用 `mmap` 来加载模型，实现快速加载和保存。
 - 易于使用：不管用哪种语言，都可以使用少量的代码轻松加载和保存模型，而无需外部库。
 - 信息完整：加载模型需要的全部信息都包含在模型文件中，用户不需要其他信息。
 
-GGJT 和 GGUF 的主要区别就是， GGJT 使用键值结构来存储超参数（现在被称为元数据），而不是使用没有类型化的值列表。这使得可以在不破坏与现有模型的兼容性的情况下添加新的元数据，并且可以使用可能有助于推理和识别模型来标注模型。
+GGJT 和 GGUF 的主要区别就是，GGJT 使用键值（Key-Value）结构来存储超参数（现在被称为元数据），而不是使用没有类型化的值列表。这使得可以在不破坏与现有模型的兼容性的情况下添加新的元数据，并且可以使用可能有助于推理和识别模型来标注模型。
 
 ### GGUF 命名规则
 
@@ -29,19 +29,19 @@ GGUF 遵守 `<BaseName><SizeLabel><FineTune><Version><Encoding><Type><Shard>.ggu
     - 可以从 GGUF 的元数据 `general.basename` 中得到，只需要将空格换成 `-` 。
 2. **SizeLabel**：参数权重等级（对于排行榜很管用）展现为 `<expertCount>x<count><scale-prefix>`
     - 如果可用，可以从 GGUF 的元数据 `general.size_label` ，如果缺失则计算出来。
-    - Rounded decimal point is supported in count with a single letter scale prefix to assist in floating point exponent shown below
+    - 计数中支持四舍五入的小数点，使用单个字母前缀来辅助如下的浮点指数计数：
       - `Q`：万亿亿个参数。
       - `T`：万亿个参数。
       - `B`：十亿个参数。
       - `M`：百万个参数。
       - `K`：千个参数。
     - 可以按需要添加额外的 `-<attributes><count><scale-prefix>` 来表示其他感兴趣的属性
-3. **FineTune**：模型微调目标的一个描述性名称（例如对话、指令等等）
+3. **FineTune**：模型微调目标的一个描述性名称（例如聊天、指令等等）
     - 可以从 GGUF 的元数据 `general.finetune` 中得到，只需要将空格替换成 `-` 。
 4. **Version**：（可选） 表示模型的版本号，格式为 `v<Major>.<Minor>`
     - 如果版本号缺失，就假设 `1.0` (第一个公开发布)
     - 可以从 GGUF 的元数据 `general.version` 中得到
-5. **Encoding**：Indicates the weights encoding scheme that was applied to the model. Content, type mixture and arrangement however are determined by user code and can vary depending on project needs.
+5. **Encoding**：表示模型应用的权重编码方案。而内容、类型混合和排列方式由用户的代码决定，并且可以按照项目需求改变。
 6. **Type**：表示 GGUF 文件的类型，及其预期用途
     - 如果缺失，那么这个文件默认是一个典型的 GGUF 张量模型文件。
     - `LoRA`： GGUF 文件是 LoRa 适配器。
@@ -52,7 +52,7 @@ GGUF 遵守 `<BaseName><SizeLabel><FineTune><Version><Encoding><Type><Shard>.ggu
     - *ShardTotal*：这个模型中的分片总数。必须使用 0 填充为 5 个数字。
 
 
-#### Validating Above Naming Convention
+#### 验证上述的命名规则
 
 所有的模型文件至少应该包含 BaseName 、 SizeLabel 和 Version ，以便验证一个文件是否符合 GGUF 的命名规范。例如，如果省略了 Version ，就很容易把 Encoding 误认为是 FineTune 。
 
@@ -65,14 +65,14 @@ GGUF 遵守 `<BaseName><SizeLabel><FineTune><Version><Encoding><Type><Shard>.ggu
     - 专家数量：8
     - 参数数量：7B
     - 版本：v0.1
-    - Weight Encoding Scheme：KQ2
+    - 权重编码方案：KQ2
 
   * `Hermes-2-Pro-Llama-3-8B-F16.gguf`:
     - 模型名称：Hermes 2 Pro Llama 3
     - 专家数量：0
     - 参数数量：8B
     - 版本：v1.0
-    - Weight Encoding Scheme：F16
+    - 权重编码方案：F16
     - 分片：N/A
 
   * `Grok-100B-v1.0-Q4_0-00003-of-00009.gguf`
@@ -80,11 +80,10 @@ GGUF 遵守 `<BaseName><SizeLabel><FineTune><Version><Encoding><Type><Shard>.ggu
     - 专家数量：0
     - 参数数量：100B
     - 版本：v1.0
-    - Weight Encoding Scheme：Q4_0
-    - 分片：3 out of 9 total shards
+    - 权重编码方案：Q4_0
+    - 分片：总共 9 个分片中的第 3 个
 
-
-<details><summary>Example Node.js Regex Function</summary>
+<details><summary>Node.js 正则表达式方法示例</summary>
 
 ```js
 #!/usr/bin/env node
@@ -125,7 +124,7 @@ testCases.forEach(({ filename, expected }) => {
 ![文件结构](https://github.com/ggerganov/ggml/assets/1991296/c3623641-3a1d-408e-bfaf-1b7c4e16aa63)
 *图表由 [@mishig25](https://github.com/mishig25) 绘制（ GGUF v3 ）*
 
-GGUF files are structured as follows. They use a global alignment specified in the `general.alignment` metadata field, referred to as `ALIGNMENT` below. Where required, the file is padded with `0x00` bytes to the next multiple of `general.alignment`.
+GGUF 的文件结构如下。它们使用在 `general.alignment` 元数据字段中指定的全局对齐，以下称为 `ALIGNMENT` 。在需要时，文件使用 `0x00` 字节填充，使它达到 `general.alignment` 的下一个倍数。
 
 Fields, including arrays, are written sequentially without alignment unless otherwise specified.
 
@@ -339,7 +338,7 @@ struct gguf_file_t {
 
 </details>
 
-## 标准化的键值对
+## 标准化的键值对（Key-Value）
 
 The following key-value pairs are standardized. This list may grow in the future as more use cases are discovered. Where possible, names are shared with the original model definitions to make it easier to map between the two.
 
@@ -371,11 +370,11 @@ By convention, most counts/lengths/etc are `uint64` unless otherwise specified. 
 
 #### General 元数据
 
-- `general.name: string`：The name of the model. This should be a human-readable name that can be used to identify the model. It should be unique within the community that the model is defined in.
+- `general.name: string`：模型的名称。这应该是一个人类可读的名字，并可以用来识别模型。它应该在模型定义的社区中是唯一的。
 - `general.author: string`：模型的作者。
 - `general.version: string`：模型的版本。
 - `general.organization: string`：模型的组织。
-- `general.basename: string`：The base model name / architecture of the model
+- `general.basename: string`：模型的基础名称 / 架构。
 - `general.finetune: string`：What has the base model been optimized toward.
 - `general.description: string`：free-form description of the model including anything that isn't covered by the other fields
 - `general.quantized_by: string`：The name of the individual who quantized the model
@@ -478,14 +477,14 @@ It is recommended that models use the newer keys if possible, as they are more f
 
 #### SSM
 
-- `[llm].ssm.conv_kernel: uint32`：The size of the rolling/shift state.
-- `[llm].ssm.inner_size: uint32`：The embedding size of the states.
-- `[llm].ssm.state_size: uint32`：The size of the recurrent state.
-- `[llm].ssm.time_step_rank: uint32`：The rank of time steps.
+- `[llm].ssm.conv_kernel: uint32`：滚动/平移状态的大小。
+- `[llm].ssm.inner_size: uint32`：状态的嵌入大小。
+- `[llm].ssm.state_size: uint32`：循环状态的大小。
+- `[llm].ssm.time_step_rank: uint32`：时间不长的排名。
 
 #### 模型
 
-The following sections describe the metadata for each model architecture. Each key specified _must_ be present.
+以下部分描述了每种模型架构的元数据。每个指定的键 _必须_ 存在。
 
 ##### LLaMA
 
@@ -578,9 +577,9 @@ The following sections describe the metadata for each model architecture. Each k
 
 ###### 可选
 
-- `falcon.tensor_data_layout`:
+- `falcon.tensor_data_layout`：
 
-  - `jploski` (author of the original GGML implementation of Falcon):
+  - `jploski` （Falcon 的原始 GGML 实现的作者）：
 
     ```python
     # The original query_key_value tensor contains n_head_kv "kv groups",
@@ -615,7 +614,7 @@ The following sections describe the metadata for each model architecture. Each k
 
 ##### RWKV
 
-The vocabulary size is the same as the number of rows in the `head` matrix.
+词汇表的大小与 `head` 矩阵中的行数相同。
 
 - `rwkv.architecture_version: uint32`：The only allowed value currently is 4. Version 5 is expected to appear some time in the future.
 - `rwkv.context_length: uint64`：Length of the context used during training or fine-tuning. RWKV is able to handle larger context than this limit, but the output quality may suffer.
@@ -625,9 +624,9 @@ The vocabulary size is the same as the number of rows in the `head` matrix.
 
 ##### Whisper
 
-Keys that do not have types defined should be assumed to share definitions with `llm.` keys.
-(For example, `whisper.context_length` is equivalent to `llm.context_length`.)
-This is because they are both transformer models.
+应当假设没有类型定义的键与 `llm.` 键相同。
+（例如，`whisper.context_length` 等价于 `llm.context_length` 。）
+这是因为他们都是 Transformer 模型。
 
 - `whisper.encoder.context_length`
 - `whisper.encoder.embedding_length`
@@ -640,20 +639,20 @@ This is because they are both transformer models.
 - `whisper.decoder.block_count`
 - `whisper.decoder.attention.head_count`
 
-#### Prompting
+#### 提示词
 
-**TODO**：Include prompt format, and/or metadata about how it should be used (instruction, conversation, autocomplete, etc).
+**TODO**：包含提示词格式和 / 或关于应该如何使用的元数（说明、对话、自动完成的）。
 
 ### LoRA
 
-**TODO**：Figure out what metadata is needed for LoRA. Probably desired features:
+**TODO**：确定 LoRA 需要哪些元数据。可能需要的特性包括：
 
-- match an existing model exactly, so that it can't be misapplied
-- be marked as a LoRA so executors won't try to run it by itself
+- 完全匹配一个现有的模型，以免不会被错误应用
+- 标记为 LoRA ，这样执行器不会尝试运行它
 
-Should this be an architecture, or should it share the details of the original model with additional fields to mark it as a LoRA?
+应该是一个架构，还是应该保留原始模型的细节并添加额外的字段来把它标记成 LoRA ？
 
-### Tokenizer
+### 分词器
 
 The following keys are used to describe the tokenizer of the model. It is recommended that model authors support as many of these as possible, as it will allow for better tokenization quality with supported executors.
 
@@ -672,86 +671,88 @@ It is not guaranteed to be standardized across models, and may change in the fut
 - `tokenizer.ggml.scores: array[float32]`：If present, the score/probability of each token. If not present, all tokens are assumed to have equal probability. If present, it must have the same length and index as `tokens`.
 - `tokenizer.ggml.token_type: array[int32]`：The token type (1=normal, 2=unknown, 3=control, 4=user defined, 5=unused, 6=byte). If present, it must have the same length and index as `tokens`.
 - `tokenizer.ggml.merges: array[string]`：If present, the merges of the tokenizer. If not present, the tokens are assumed to be atomic.
-- `tokenizer.ggml.added_tokens: array[string]`：If present, tokens that were added after training.
+- `tokenizer.ggml.added_tokens: array[string]`：如果出现，代表训练之后添加的分词。
 
-##### Special tokens
+##### 特别的分词
 
-- `tokenizer.ggml.bos_token_id: uint32`：Beginning of sequence marker
-- `tokenizer.ggml.eos_token_id: uint32`：End of sequence marker
-- `tokenizer.ggml.unknown_token_id: uint32`：Unknown token
-- `tokenizer.ggml.separator_token_id: uint32`：Separator token
-- `tokenizer.ggml.padding_token_id: uint32`：Padding token
+- `tokenizer.ggml.bos_token_id: uint32`：序列标记的开始
+- `tokenizer.ggml.eos_token_id: uint32`：序列标记的结束
+- `tokenizer.ggml.unknown_token_id: uint32`：未知的分词
+- `tokenizer.ggml.separator_token_id: uint32`：分隔的分词
+- `tokenizer.ggml.padding_token_id: uint32`：填充的分词
 
 #### Hugging Face
 
-Hugging Face maintains their own `tokenizers` library that supports a wide variety of tokenizers. If your executor uses this library, it may be able to use the model's tokenizer directly.
+Hugging Face 会维护他们自己的 `tokenizers` 库，支持大量分词器。如果你的执行器使用这个库，它可能可以直接使用模型的分词器。
 
-- `tokenizer.huggingface.json: string`：the entirety of the HF `tokenizer.json` for a given model (e.g. <https://huggingface.co/mosaicml/mpt-7b-instruct/blob/main/tokenizer.json>). Included for compatibility with executors that support HF tokenizers directly.
+- `tokenizer.huggingface.json: string`：给定模型的 HF `tokenizer.json` 的完整内容（例如 <https://huggingface.co/mosaicml/mpt-7b-instruct/blob/main/tokenizer.json>）。包含功能是为了与直接支持 HF 分词器的执行器兼容。
 
 #### 其他
 
-Other tokenizers may be used, but are not necessarily standardized. They may be executor-specific. They will be documented here as they are discovered/further developed.
+可以使用其他的分词器，但是他们可能没有标准化。他们可能是适配特定执行器的。当他们在发现或进一步开发之后，他们会记录在这里。
 
-- `tokenizer.rwkv.world: string`：a RWKV World tokenizer, like [this](https://github.com/BlinkDL/ChatRWKV/blob/main/tokenizer/rwkv_vocab_v20230424.txt). This text file should be included verbatim.
-- `tokenizer.chat_template : string`：a Jinja template that specifies the input format expected by the model. For more details see：<https://huggingface.co/docs/transformers/main/en/chat_templating>
+- `tokenizer.rwkv.world: string`：一个 RWKV 世界的分词器，比如 [这个](https://github.com/BlinkDL/ChatRWKV/blob/main/tokenizer/rwkv_vocab_v20230424.txt) 。必须原样引入这个文本文件。
+- `tokenizer.chat_template : string`：一个 Jinja 模板，它指定模型需要的输入格式。更多细节可以查看：<https://huggingface.co/docs/transformers/main/en/chat_templating>
 
-### Computation graph
+### 计算图
 
-This is a future extension and still needs to be discussed, and may necessitate a new GGUF version. At the time of writing, the primary blocker is the stabilization of the computation graph format.
+这是一个未来的扩展，仍然需要讨论，并且可能需要一个新的 GGUF 版本。在写这个文档的时候，主要阻碍是计算图格式的稳定性。
 
-A sample computation graph of GGML nodes could be included in the model itself, allowing an executor to run the model without providing its own implementation of the architecture. This would allow for a more consistent experience across executors, and would allow for more complex architectures to be supported without requiring the executor to implement them.
+一个 GGML 节点的计算图样例可以包含在模型当中，允许一个执行器不需要提供它自己的架构实现就可以运行模型。这会在执行器之间提供一个一致的体验，并且能支持一个更复杂的架构而不需要执行器实现他们。
 
 ## 标准化的张量名称
 
-To minimize complexity and maximize compatibility, it is recommended that models using the transformer architecture use the following naming convention for their tensors:
+为了降低复杂度并提高兼容性，建议使用 Transformer 架构的模型为它们的张量使用如下命名规范：
 
-### Base layers
+### 基础层
 
-`AA.weight` `AA.bias`
+- `AA.weight`
+- `AA.bias`
 
-where `AA` can be:
+其中 `AA` 可以是：
 
-- `token_embd`：Token embedding layer
-- `pos_embd`：Position embedding layer
-- `output_norm`：Output normalization layer
-- `output`：Output layer
+- `token_embd`：Token 嵌入层
+- `pos_embd`：位置嵌入层
+- `output_norm`：输出归一化层
+- `output`：输出层
 
-### Attention and feed-forward layer blocks
+### 注意力层和前馈层的模块
 
-`blk.N.BB.weight` `blk.N.BB.bias`
+- `blk.N.BB.weight`
+- `blk.N.BB.bias`
 
-where N signifies the block number a layer belongs to, and where `BB` could be:
+其中 N 表示的是一个层所属的模块编号，而 `BB` 可以是：
 
-- `attn_norm`：Attention normalization layer
-- `attn_norm_2`：Attention normalization layer
-- `attn_qkv`：Attention query-key-value layer
-- `attn_q`：Attention query layer
-- `attn_k`：Attention key layer
-- `attn_v`：Attention value layer
-- `attn_output`：Attention output layer
+- `attn_norm`：注意力归一化层
+- `attn_norm_2`：注意力归一化层
+- `attn_qkv`：注意力 查询-键-值 层
+- `attn_q`：注意力查询层
+- `attn_k`：注意力键层
+- `attn_v`：注意力值层
+- `attn_output`：注意力输出层
 
-- `ffn_norm`：Feed-forward network normalization layer
-- `ffn_up`：Feed-forward network "up" layer
-- `ffn_gate`：Feed-forward network "gate" layer
-- `ffn_down`：Feed-forward network "down" layer
-- `ffn_gate_inp`：Expert-routing layer for the Feed-forward network in MoE models
-- `ffn_gate_exp`：Feed-forward network "gate" layer per expert in MoE models
-- `ffn_down_exp`：Feed-forward network "down" layer per expert in MoE models
-- `ffn_up_exp`：Feed-forward network "up" layer per expert in MoE models
+- `ffn_norm`：前馈网络归一化层
+- `ffn_up`：前馈网络 Up 层
+- `ffn_gate`：前馈网络 Gate 层
+- `ffn_down`：前馈网络 Down 层
+- `ffn_gate_inp`：MoE 模型中的前馈网络的专家路由层 
+- `ffn_gate_exp`：MoE 模型中每个专家的前馈网络 Gate 层
+- `ffn_down_exp`：MoE 模型中每个专家的前馈网络 Down 层
+- `ffn_up_exp`：MoE 模型中每个专家的前馈网络 Up 层
 
-- `ssm_in`：State space model input projections layer
-- `ssm_conv1d`：State space model rolling/shift layer
-- `ssm_x`：State space model selective parametrization layer
-- `ssm_a`：State space model state compression layer
-- `ssm_d`：State space model skip connection layer
-- `ssm_dt`：State space model time step layer
-- `ssm_out`：State space model output projection layer
+- `ssm_in`：状态空间模型的输入投影层
+- `ssm_conv1d`：状态空间模型的滚动/平移层
+- `ssm_x`：状态空间模型的选择性参数化层
+- `ssm_a`：状态空间模型的状态压缩层
+- `ssm_d`：状态空间模型的跳过连接层
+- `ssm_dt`：状态空间模型的时间不长层
+- `ssm_out`：状态空间模型的输出投影层
 
 ## 历史版本
 
-This document is actively updated to describe the current state of the metadata, and these changes are not tracked outside of the commits.
+这个文档在积极更新，来描述元数据的当前状态，但这些变更不会在 Commit 外部追中到。
 
-However, the format _itself_ has changed. The following sections describe the changes to the format itself.
+但是，这个格式 _自身_ 已经改变了。以下部分描述了格式自身的变更。
 
 ### v3
 
@@ -759,7 +760,7 @@ However, the format _itself_ has changed. The following sections describe the ch
 
 ### v2
 
-Most countable values (lengths, etc) were changed from `uint32` to `uint64` to allow for larger models to be supported in the future.
+最大可计算的值（长度等）从 `uint32` 变成了 `uint64`，以便未来能够支持更大的模型。
 
 ### v1
 
@@ -767,7 +768,7 @@ Most countable values (lengths, etc) were changed from `uint32` to `uint64` to a
 
 ## 历史情况
 
-The following information is provided for context, but is not necessary to understand the rest of this document.
+以下信息仅供参考，但并不是理解文档的其余部分所必须的。
 
 ### 总览
 
@@ -791,24 +792,24 @@ These formats share the same fundamental structure:
 
 Notably, this structure does not identify what model architecture the model belongs to, nor does it offer any flexibility for changing the structure of the hyperparameters. This means that the only way to add new hyperparameters is to add them to the end of the list, which is a breaking change for existing models.
 
-### 缺点
+### 不足
 
-Unfortunately, over the last few months, there are a few issues that have become apparent with the existing models:
+不幸的是，在过去的几个月，现有的模型出现了一些问题：
 
-- There's no way to identify which model architecture a given model is for, because that information isn't present
-  - Similarly, existing programs cannot intelligently fail upon encountering new architectures
-- Adding or removing any new hyperparameters is a breaking change, which is impossible for a reader to detect without using heuristics
-- Each model architecture requires its own conversion script to their architecture's variant of GGML
-- Maintaining backwards compatibility without breaking the structure of the format requires clever tricks, like packing the quantization version into the ftype, which are not guaranteed to be picked up by readers/writers, and are not consistent between the two formats
+- 没办法确定一个给定的模型适合哪种模型架构，因为没有这个信息
+  - 类似的，现有的程序遇到新架构的时候，也没法自动发现
+- 添加或者移除任何新的超参数都是一个破坏性的变更，Reader 不使用 [启发式算法](https://zh.wikipedia.org/w/index.php?title=%E5%90%AF%E5%8F%91%E5%BC%8F%E7%AE%97%E6%B3%95) 就不可能发现
+- 每种模型架构需要它自己的转换脚本，转换成对应架构的 GGML 变体
+- 要维护向后兼容性而不破坏格式的结构需要一些聪明的操作，例如在把量化版本打包到 ftype 中，但这些操作不能保证能被 Reader 或 Writer 获取到，并且在两种格式之间也无法保证一致性。
 
 ### 为什么不是其他格式？
 
 有其他几种格式可以使用，但问题包括：
 
-- requiring additional dependencies to load or save the model, which is complicated in a C environment
-- limited or no support for 4-bit quantization
-- existing cultural expectations (e.g. whether or not the model is a directory or a file)
-- lack of support for embedded vocabularies
-- lack of control over direction of future development
+- 需要额外的依赖来加载和保存模型，这在 C 语言环境中会很复杂
+- 对 4-bit 量化只有有限的支持或者不支持
+- 现有的文化预期（例如模型是目录还是文件）
+- 缺少对嵌入式词汇表的支持
+- 对于未来的发展方向缺少控制
 
-Ultimately, it is likely that GGUF will remain necessary for the foreseeable future, and it is better to have a single format that is well-documented and supported by all executors than to contort an existing format to fit the needs of GGML.
+最终，在可预见的未来，GGUF 仍然可能是必要的，而且，有一个文档齐全并得到所有执行器支持的格式，要好过扭曲现有的格式来适应 GGML 的需求。
