@@ -1,4 +1,4 @@
-[toc]
+原始 URL：<https://github.com/ggml-org/ggml/blob/master/docs/gguf.md>
 
 # GGUF
 
